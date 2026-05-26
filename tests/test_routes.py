@@ -37,7 +37,7 @@ class TestAccountService(TestCase):
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
         init_db(app)
-        
+
         talisman.force_https = False
 
     @classmethod
@@ -196,3 +196,11 @@ class TestAccountService(TestCase):
         }
         for key, value in headers.items():
             self.assertEqual(response.headers.get(key), value)
+
+            
+    def test_cors_security(self):
+        """应该返回 CORS 头部"""
+        response = self.client.get('/', environ_overrides=HTTPS_ENVIRON)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # 检查 CORS 头部
+        self.assertEqual(response.headers.get('Access-Control-Allow-Origin'), '*')
